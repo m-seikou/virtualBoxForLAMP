@@ -1,0 +1,13 @@
+---
+- hosts: vagrant
+  connection: local
+  become: true
+  roles:
+    - {role: common}
+    - {role: mysql}
+    - {role: fluentd}
+    - {role: redis}
+    - {role: php}
+    - {role: nginx}
+    - {role: ridgepole}
+    - {role: appSetup}

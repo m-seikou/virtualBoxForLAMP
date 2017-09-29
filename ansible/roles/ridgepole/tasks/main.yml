@@ -1,0 +1,56 @@
+---
+- name: install rbenv
+  git: >
+    repo=https://github.com/sstephenson/rbenv.git
+    dest=/usr/local/rbenv
+- name: install ruby-build
+  git: >
+    repo=https://github.com/sstephenson/ruby-build.git
+    dest=/usr/local/rbenv/plugins/ruby-build/
+
+# RBENV_ROOTの設定
+- name: check RBENV_ROOT exist
+  shell: ". /etc/bashrc; test -v RBENV_ROOT"
+  register: RBENV_ROOT
+  failed_when: RBENV_ROOT.rc not in [0, 1]
+  changed_when: False
+- name: set RBENV_ROOT
+  shell: "echo 'export RBENV_ROOT=\"/usr/local/rbenv\"' >> /etc/bashrc"
+  when: RBENV_ROOT.rc != 0
+
+# rbenvにパスを通す
+- name: check rbenv exist
+  shell: ". /etc/bashrc; which rbenv"
+  register: rbenv
+  failed_when: rbenv.rc not in [0, 1]
+  changed_when: False
+- name: add rbenv path
+  shell: "echo 'export PATH=\"/usr/local/rbenv/bin:/usr/local/rbenv/shims:$PATH\"' >> /etc/bashrc"
+  when: rbenv.rc == 1
+- name: add rbenv
+  shell: "echo 'eval \"$(rbenv init --no-rehash -)\"' >> /etc/bashrc"
+  when: rbenv.rc != 0
+
+#install ruby
+- name: check ruby exist
+  shell: ". /etc/bashrc; which ruby"
+  register: ruby
+  failed_when: ruby.rc not in [0, 1]
+  changed_when: False
+- name: install ruby
+  shell: "{{ item }}"
+  with_items:
+    - ". /etc/bashrc; rbenv install -v 2.4.2"
+    - ". /etc/bashrc; rbenv rehash"
+    - ". /etc/bashrc; rbenv global 2.4.2"
+  when: ruby.rc != 0
+
+# ridgepole
+- name: check ridgepole exist
+  shell: ". /etc/bashrc; which ridgepole"
+  register: ridgepole
+  failed_when: ridgepole.rc not in [0, 1]
+  changed_when: False
+- name: install ridgepole
+  shell: ". /etc/bashrc; gem install mysql2 ridgepole"
+  when: ridgepole.rc != 0

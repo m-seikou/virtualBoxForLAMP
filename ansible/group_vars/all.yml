@@ -1,0 +1,8 @@
+---
+project_name: projectName
+
+# shared directory
+application_root: /var/projectName/server
+
+# for nginx
+document_root: /var/projectName/server/public

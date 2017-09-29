@@ -1,0 +1,6 @@
+---
+- name: install redis
+  yum: name=redis
+  notify: restart redis
+- name: restart redis
+  service: name=redis enabled=yes

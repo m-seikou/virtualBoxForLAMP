@@ -1,0 +1,42 @@
+---
+- name: php core
+  yum: name='php70'
+- name: php devel
+  yum: name='php70-php-devel'
+- name: php modules
+  yum: name="{{ item }}"
+  with_items:
+    - php70-php-bcmath
+    - php70-php-fpm
+    - php70-php-mbstring
+    - php70-php-mysqlnd
+    - php70-php-opcache
+    - php70-php-pecl-apcu
+    - php70-php-pecl-yaml
+    - php70-php-pecl-apcu
+    - php70-php-pecl-zip
+    - php70-php-pecl-redis
+    - php70-php-pecl-xdebug
+    - php70-php-pdo
+    - php70-php-ast
+    - php70-php-xml
+- file:
+    src: /usr/bin/php70
+    dest: /usr/bin/php
+    state: link
+
+- name: start php-fpm
+  service: name=php70-php-fpm state=restarted enabled=yes
+
+# install composer
+- name: check composer exist
+  shell: ". /etc/bashrc; which composer"
+  register: composer
+  failed_when: composer.rc not in [0, 1]
+  changed_when: False
+- name: get composer installer
+  get_url: url=https://getcomposer.org/installer dest=/tmp/installer
+  when: composer.rc != 0
+- name: install composer
+  shell: "/usr/bin/php /tmp/installer --install-dir=/usr/local/bin --filename=composer"
+  when: composer.rc != 0

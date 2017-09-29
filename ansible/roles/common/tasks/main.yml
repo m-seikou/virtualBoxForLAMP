@@ -1,0 +1,30 @@
+---
+- name: Disable SELinux
+  selinux:
+    state: disabled
+- name: add epel repository
+  yum: name=epel-release.noarch
+- name: add remi-safe repository
+  yum_repository:
+    name: remi
+    description: remi YUM repo
+    baseurl: http://rpms.remirepo.net/enterprise/$releasever/safe/$basearch/
+- name: install remi PGP key
+  rpm_key:
+    key: "http://rpms.remirepo.net/RPM-GPG-KEY-remi"
+    state: present
+- name: upgrade all packages, excluding kernel
+  yum:
+    name: '*'
+    state: latest
+    exclude: kernel*
+- name: install packages
+  yum: name={{ item }}
+  with_items:
+    - curl
+    - git
+    - openssl-devel
+    - readline-devel
+    - zlib-devel
+    - bind-utils
+    - net-tools

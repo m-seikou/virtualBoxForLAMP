@@ -1,0 +1,18 @@
+---
+- name: add repository MySQL 5.6 Community Server
+  yum_repository:
+    name: MySQL
+    description: MySQL 5.6 Community Server
+    baseurl: http://repo.mysql.com/yum/mysql-5.6-community/el/6/$basearch/
+- name: install MySQL 5.6 PGP key
+  rpm_key:
+    key: "http://repo.mysql.com/RPM-GPG-KEY-mysql"
+    state: present
+- name: install mysql
+  yum: name={{ item }}
+  with_items:
+    - mysql-community-server
+    - mysql-community-devel
+    - MySQL-python
+- name: mysql restart
+  service: name=mysqld state=restarted enabled=yes

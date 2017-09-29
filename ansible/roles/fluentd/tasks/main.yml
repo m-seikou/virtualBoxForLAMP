@@ -1,0 +1,10 @@
+---
+- name: download install shell
+  get_url:
+    url: http://toolbelt.treasuredata.com/sh/install-redhat-td-agent2.sh
+    dest: /tmp/install-redhat-td-agent2.sh
+- name: install td-agent
+  command: "sh /tmp/install-redhat-td-agent2.sh"
+  notify: restart td-agent
+- name: restart td-agent
+  service: name=td-agent enabled=yes
